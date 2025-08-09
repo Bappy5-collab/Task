@@ -155,7 +155,9 @@ function Home() {
                                     className="w-full outline-none"
                                 />
                             </div>
-                            <button className="bg-indigo-600 text-white px-6 py-4 hover:bg-indigo-700"> </button>
+                            <button className="bg-indigo-600 text-white px-6 py-4 hover:bg-indigo-700 flex items-center justify-center">
+                                <FaSearch className="text-lg" />
+                            </button>
                         </div>
                     </div>
                 </div>
