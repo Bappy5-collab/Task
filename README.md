@@ -5,7 +5,7 @@ An online shop experience review app. Users can add, view, search, and update or
 ##  Live Demo  
 [https://review-ai-27cfdf.netlify.app](https://review-ai-27cfdf.netlify.app)
 
-##  Time taken
+- Time taken
 - 4 hours
 
 ##  Setup Instructions
