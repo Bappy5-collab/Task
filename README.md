@@ -9,7 +9,6 @@ An online shop experience review app. Users can add, view, search, and update or
 - 4 hours
 
 ##  Setup Instructions
-
 1. **Clone this repository**  
    ```bash
 - git clone <https://github.com/Bappy5-collab/Task>
