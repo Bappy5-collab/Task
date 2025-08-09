@@ -171,7 +171,7 @@ function Home() {
             </div>
             <div><hr className="text-gray-200" /> </div>
             {filteredReviews.length === 0 && (
-                <p className="text-center text-red-500">No matching reviews found.</p>
+                <p className="text-center text-red-500">No  reviews found.</p>
             )}
             {/* Review all cards */}
             <div className="space-y-6 px-4 py-6 max-w-6xl mx-auto">
