@@ -6,7 +6,7 @@ An online shop experience review app. Users can add, view, search, and update or
 [https://review-ai-27cfdf.netlify.app](https://review-ai-27cfdf.netlify.app)
 
 - Time taken
-- total 4 hours.[not continues]
+- total 2 hours.[not continues]
 
 ##  Setup Instructions
 1. **Clone this repository**  
