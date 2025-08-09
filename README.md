@@ -6,11 +6,10 @@ An online shop experience review app. Users can add, view, search, and update or
 [https://review-ai-27cfdf.netlify.app](https://review-ai-27cfdf.netlify.app)
 
 - Time taken
-- 4 hours
+- total 4 hours.[not continues]
 
 ##  Setup Instructions
 1. **Clone this repository**  
-   ```bash
 - git clone <https://github.com/Bappy5-collab/Task>
 - cd review-ai
 - npm install
