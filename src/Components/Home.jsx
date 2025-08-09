@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaPlus, FaRegStar, FaSearch, FaStar } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -11,12 +12,11 @@ function Home() {
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
 
-    // Modal 
-    const [showModal, setShowModal] = useState(false);
+    const [showFormModal, setShowFormModal] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [modalAction, setModalAction] = useState(null);
     const [targetReview, setTargetReview] = useState(null);
 
-    // Search 
     const [searchTerm, setSearchTerm] = useState("");
 
     const [reviews, setReviews] = useState(() => {
@@ -32,6 +32,24 @@ function Home() {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(reviews));
     }, [reviews]);
 
+    const handleAddNew = () => {
+        setShopName("");
+        setReviewText("");
+        setRating("5");
+        setIsEditing(false);
+        setEditId(null);
+        setShowFormModal(true);
+    };
+
+    const handleEdit = (review) => {
+        setShopName(review.shopName);
+        setReviewText(review.reviewText);
+        setRating(review.rating.toString());
+        setIsEditing(true);
+        setEditId(review.id);
+        setShowFormModal(true);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!shopName.trim() || !reviewText.trim()) {
@@ -42,7 +60,7 @@ function Home() {
         if (isEditing) {
             setModalAction("update");
             setTargetReview({ id: editId });
-            setShowModal(true);
+            setShowConfirmModal(true);
         } else {
             const newReview = {
                 id: Date.now(),
@@ -53,9 +71,7 @@ function Home() {
             };
             setReviews((prev) => [newReview, ...prev]);
             toast.success("Review added successfully!");
-            setShopName("");
-            setReviewText("");
-            setRating("5");
+            closeFormModal();
         }
     };
 
@@ -73,167 +89,179 @@ function Home() {
             )
         );
         toast.success("Review updated successfully!");
-        setIsEditing(false);
-        setEditId(null);
-        setShopName("");
-        setReviewText("");
-        setRating("5");
-        closeModal();
+        closeFormModal();
+        closeConfirmModal();
     };
 
     const handleDelete = (id) => {
         setModalAction("delete");
         setTargetReview({ id });
-        setShowModal(true);
+        setShowConfirmModal(true);
     };
 
     const confirmDelete = () => {
         setReviews((prev) => prev.filter((rev) => rev.id !== targetReview.id));
         toast.info("Review deleted!");
-        closeModal();
+        closeConfirmModal();
     };
 
-    const closeModal = () => {
-        setShowModal(false);
+    const closeFormModal = () => {
+        setShowFormModal(false);
+        setIsEditing(false);
+        setEditId(null);
+        setShopName("");
+        setReviewText("");
+        setRating("5");
+    };
+
+    const closeConfirmModal = () => {
+        setShowConfirmModal(false);
         setModalAction(null);
         setTargetReview(null);
     };
 
-    const handleEdit = (review) => {
-        setShopName(review.shopName);
-        setReviewText(review.reviewText);
-        setRating(review.rating.toString());
-        setIsEditing(true);
-        setEditId(review.id);
-    };
-
     const renderStars = (num) => (
-        <span className="text-yellow-400 text-lg">
-            {"★".repeat(num) + "☆".repeat(5 - num)}
+        <span className="text-yellow-400 text-lg flex">
+            {[...Array(5)].map((_, index) =>
+                index < num ? (
+                    <FaStar key={index} />
+                ) : (
+                    <FaRegStar key={index} />
+                )
+            )}
         </span>
     );
 
-    // Filter 
+
     const filteredReviews = reviews.filter((rev) =>
         rev.shopName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
-        <div className="max-w-xl mx-auto p-6 font-sans">
+        <div className="mx-auto font-san ">
+            {/* Banner */}
+            <section className="mb-12 bg-gradient-to-br from-purple-700 via-indigo-700 to-blue-500 text-white overflow-hidden flex items-center h-[320px]">
+                <div className="w-full">
+                    <div className="max-w-7xl mx-auto px-6 py-16 text-center md:text-left">
+                        <p className="text-cyan-300 text-xl font-medium mb-2">Find Your Review Experience</p>
+                        <h1 className="text-2xl md:text-5xl font-bold leading-tight">Discover & Promote <br /> Upcoming Review</h1>
+                        <div className="mt-10 flex flex-col md:flex-row bg-white rounded-xl overflow-hidden text-gray-700 shadow-lg w-full md:max-w-5xl">
+                            <div className="flex items-center gap-2 p-4 border-b md:border-b-0 md:border-r w-full">
+                                <input
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    type="text"
+                                    placeholder="Search Review"
+                                    className="w-full outline-none"
+                                />
+                            </div>
+                            <button className="bg-indigo-600 text-white px-6 py-4 hover:bg-indigo-700"> </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <ToastContainer position="top-center" autoClose={2000} />
 
-            <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-                Online Shop Experience Review
-            </h1>
-
-            <form
-                onSubmit={handleSubmit}
-                className="mb-10 bg-white p-6 rounded-lg shadow-md"
-            >
-                <label className="block mb-2 font-semibold text-gray-700">
-                    Shop Name:
-                </label>
-                <input
-                    type="text"
-                    value={shopName}
-                    onChange={(e) => setShopName(e.target.value)}
-                    className="w-full px-4 py-2 mb-5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    placeholder="Enter shop name"
-                />
-
-                <label className="block mb-2 font-semibold text-gray-700">
-                    Review:
-                </label>
-                <textarea
-                    value={reviewText}
-                    onChange={(e) => setReviewText(e.target.value)}
-                    rows={4}
-                    className="w-full px-4 py-2 mb-5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    placeholder="Write your review here"
-                />
-
-                <label className="block mb-2 font-semibold text-gray-700">
-                    Rating:
-                </label>
-                <select
-                    value={rating}
-                    onChange={(e) => setRating(e.target.value)}
-                    className="w-full px-4 py-2 mb-6 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                >
-                    {[5, 4, 3, 2, 1].map((star) => (
-                        <option key={star} value={star}>
-                            {star} {star === 1 ? "star" : "stars"}
-                        </option>
-                    ))}
-                </select>
-
-                <button
-                    type="submit"
-                    className={`w-full ${isEditing
-                            ? "bg-yellow-500 hover:bg-yellow-600"
-                            : "bg-indigo-600 hover:bg-indigo-700"
-                        } text-white font-semibold py-3 rounded-md transition-colors`}
-                >
-                    {isEditing ? "Update Review" : "Submit Review"}
+            <div className="flex justify-center items-center  mb-6">
+                <button onClick={handleAddNew} className="flex items-center justify-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    <FaPlus className="text-white" />
+                    Add New Review
                 </button>
-            </form>
-
-            {/* Search Input */}
-            <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by shop name..."
-                className="w-full px-4 py-2 mb-6 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
-
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Reviews</h2>
-
+            </div>
+            <div><hr className="text-gray-200" /> </div>
             {filteredReviews.length === 0 && (
-                <p className="text-center text-gray-600">
-                    No matching reviews found.
-                </p>
+                <p className="text-center text-red-500">No matching reviews found.</p>
             )}
+            {/* Review all cards */}
+            <div className="space-y-6 px-4 py-6 max-w-6xl mx-auto">
+                <h2 className="text-2xl font-semibold mb-4 text-gray-800">Recent Review</h2>
 
-            <div className="space-y-6">
                 {filteredReviews.map((review) => (
-                    <div
-                        key={review.id}
-                        className="bg-white p-5 rounded-lg shadow-md border border-gray-200"
-                    >
-                        <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-xl font-bold text-gray-900">
-                                {review.shopName}
-                            </h3>
+                    <div key={review.id} className="bg-gray-50 p-5 rounded-xl border border-gray-300 shadow-sm">
+                        <div className="mb-2">
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-900">{review.shopName}</h3>
                             {renderStars(review.rating)}
                         </div>
-                        <p className="text-gray-700 mb-3 whitespace-pre-line">
-                            {review.reviewText}
-                        </p>
-                        <div className="text-sm text-gray-500 mb-3">{review.date}</div>
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => handleEdit(review)}
-                                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
-                            >
-                                Edit
-                            </button>
-                            <button
-                                onClick={() => handleDelete(review.id)}
-                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                            >
-                                Delete
-                            </button>
+                        <div className="text-xs sm:text-sm text-gray-500 mb-3">{review.date}</div>
+                        <p className="text-gray-700 mb-3 whitespace-pre-line text-sm sm:text-base">{review.reviewText}</p>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-end">
+                            <button onClick={() => handleEdit(review)} className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition text-sm sm:text-base"> Edit</button>
+                            <button onClick={() => handleDelete(review.id)} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition text-sm sm:text-base">  Delete </button>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Modal */}
-            {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+            {/* Form Modal */}
+            {showFormModal && (
+                <div className="fixed inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl">
+                        <h1 className="text-2xl font-bold mb-4">{isEditing ? "Edit Review" : "Add Review"} </h1>
+                        <form onSubmit={handleSubmit}>
+                            <label className="block mb-2 font-semibold text-gray-700">
+                                Shop Name:
+                            </label>
+                            <input
+                                type="text"
+                                value={shopName}
+                                onChange={(e) => setShopName(e.target.value)}
+                                className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                                placeholder="Enter shop name"
+                            />
+                            <label className="block mb-2 font-semibold text-gray-700">
+                                Review:
+                            </label>
+                            <textarea
+                                value={reviewText}
+                                onChange={(e) => setReviewText(e.target.value)}
+                                rows={4}
+                                className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                                placeholder="Write your review here"
+                            />
+
+                            <label className="block mb-2 font-semibold text-gray-700">
+                                Rating:
+                            </label>
+                            <select
+                                value={rating}
+                                onChange={(e) => setRating(e.target.value)}
+                                className="w-full px-4 py-2 mb-6 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                            >
+                                {[5, 4, 3, 2, 1].map((star) => (
+                                    <option key={star} value={star}>
+                                        {star} {star === 1 ? "star" : "stars"}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <div className="flex gap-4">
+                                <button
+                                    type="submit"
+                                    className={`flex-1 ${isEditing
+                                        ? "bg-yellow-500 hover:bg-yellow-600"
+                                        : "bg-indigo-600 hover:bg-indigo-700"
+                                        } text-white font-semibold py-2 rounded-md`}
+                                >
+                                    {isEditing ? "Update Review" : "Submit Review"}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={closeFormModal}
+                                    className="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 rounded-md"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Confirm Modal */}
+            {showConfirmModal && (
+                <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-red-100 rounded-lg shadow-lg p-6 max-w-sm w-full">
                         <h2 className="text-lg font-semibold mb-4">
                             {modalAction === "delete"
                                 ? "Are you sure you want to delete this review?"
@@ -241,8 +269,8 @@ function Home() {
                         </h2>
                         <div className="flex justify-end gap-3">
                             <button
-                                onClick={closeModal}
-                                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                                onClick={closeConfirmModal}
+                                className="px-4 py-2 bg-white rounded hover:bg-gray-400"
                             >
                                 Cancel
                             </button>
@@ -251,8 +279,8 @@ function Home() {
                                     modalAction === "delete" ? confirmDelete : confirmUpdate
                                 }
                                 className={`px-4 py-2 rounded text-white ${modalAction === "delete"
-                                        ? "bg-red-500 hover:bg-red-600"
-                                        : "bg-yellow-500 hover:bg-yellow-600"
+                                    ? "bg-red-500 hover:bg-red-600"
+                                    : "bg-yellow-500 hover:bg-yellow-600"
                                     }`}
                             >
                                 Confirm
